@@ -1,277 +1,1271 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" style="--color-main: #e6d40a; --color-bg: #74682a; --color-surface: #000000; --rgb-surface: 0, 0, 0; --font-title: 'Black Han Sans', sans-serif; --font-body: 'Pretendard', sans-serif; --bg-image: none; --bg-overlay-opacity: 0; --bg-blur: 0px;">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>scll // School Life</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>scll - School Community & Life Link</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Pretendard:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Pretendard:wght@400;700;900&family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+    
     <style>
-        body { font-family: 'Pretendard', sans-serif; background-color: #000; color: #fff; overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
-        .font-brand { font-family: 'Black Han Sans', sans-serif; }
-        .bg-main-red { background-color: #FF0000; }
-        .text-main-red { color: #FF0000; }
-        .border-main-red { border-color: #FF0000; }
-        .card-flat { background: #111; border: 2px solid #222; border-radius: 12px; }
-        .tab-content { display: none; }
-        .tab-content.active { display: flex; flex-direction: column; animation: fadeIn 0.4s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        input[type="checkbox"]:checked + label { background-color: #FF0000; color: white; border-color: #FF0000; }
-        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; display: none; align-items: center; justify-content: center; }
-        .input-dark { background: #1a1a1a; border: 2px solid #333; color: white; padding: 12px; font-weight: 900; width: 100%; outline: none; border-radius: 8px; }
-        .input-dark:focus { border-color: #FF0000; }
-        .bar-anim { transition: width 0.8s cubic-bezier(0.17, 0.67, 0.83, 0.67); }
-        ::-webkit-scrollbar { display: none; }
-        
-        /* 스플래시 화면: 통통 튀는 애니메이션 제거, 페이드 효과로 변경 */
-        #splashScreen { opacity: 1; transition: opacity 0.8s ease-in-out; }
-        .splash-text { opacity: 0; animation: logoFadeIn 1s forwards 0.2s; }
-        @keyframes logoFadeIn { from { opacity: 0; letter-spacing: 0.5em; } to { opacity: 1; letter-spacing: -0.05em; } }
-        
-        /* 잠금 화면 레이아웃 통일 및 오타 수정 */
-        .lock-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.92); z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 2rem; border-radius: 12px; backdrop-filter: blur(12px); margin-top: 4rem; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --color-main: #FF0000;
+            --color-bg: #000000;
+            --color-surface: #111111;
+            --color-border: #222222;
+            --color-text: #ffffff;
+            --font-title: 'Black Han Sans', sans-serif;
+            --font-body: 'Pretendard', sans-serif;
+        }
+
+        html, body {
+            height: 100%;
+            width: 100%;
+        }
+
+        body {
+            font-family: var(--font-body);
+            color: var(--color-text);
+            background-color: var(--color-bg);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* 배경 레이어 */
+        #bg-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-image: var(--bg-image);
+            background-size: cover;
+            background-position: center;
+            z-index: -3;
+        }
+
+        #bg-blur-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            backdrop-filter: blur(var(--bg-blur));
+            -webkit-backdrop-filter: blur(var(--bg-blur));
+            z-index: -2;
+        }
+
+        #bg-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: var(--color-bg);
+            opacity: var(--bg-overlay-opacity, 0);
+            z-index: -1;
+        }
+
+        /* 유틸리티 클래스 */
+        .font-brand { font-family: var(--font-title); }
+        .text-main-theme { color: var(--color-main); }
+        .bg-main-theme { background-color: var(--color-main); color: #fff; }
+        .border-main-theme { border-color: var(--color-main); }
+
+        /* 카드 스타일 */
+        .card-flat {
+            background-color: rgba(var(--rgb-surface), 0.85);
+            backdrop-filter: blur(10px);
+            border: 2px solid var(--color-border);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        /* 탭 애니메이션 */
+        .tab-content {
+            display: none;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .tab-content.active {
+            display: flex;
+            animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 인풋 스타일 */
+        .input-dark {
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--color-border);
+            color: var(--color-text);
+            padding: 14px;
+            font-weight: 700;
+            width: 100%;
+            outline: none;
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+            transition: border-color 0.2s;
+            font-family: inherit;
+            font-size: inherit;
+        }
+
+        .input-dark:focus {
+            border-color: var(--color-main);
+        }
+
+        textarea.input-dark {
+            resize: vertical;
+        }
+
+        /* 로딩 오버레이 */
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        /* 모달 */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            display: none;
+            align-items: flex-end;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: rgba(var(--rgb-surface), 0.95);
+            border: 2px solid var(--color-main);
+            border-radius: 16px 16px 0 0;
+            padding: 1.5rem;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @media (min-width: 640px) {
+            .modal-content {
+                border-radius: 16px;
+                max-width: 90%;
+                width: auto;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* 헤더 */
+        header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding: 0.5rem 1rem;
+            margin-bottom: 1rem;
+            border-bottom: 4px solid var(--color-main);
+            position: relative;
+            z-index: 10;
+        }
+
+        @media (min-width: 640px) {
+            header {
+                padding: 1rem 0;
+                margin-bottom: 1.5rem;
+            }
+        }
+
+        header h1 {
+            font-size: 2rem;
+            font-family: var(--font-title);
+            text-align: left;
+            letter-spacing: -0.05em;
+            cursor: pointer;
+            line-height: 1;
+            text-shadow: 0 0 10px rgba(0,0,0,0.7);
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        }
+
+        @media (min-width: 640px) {
+            header h1 {
+                font-size: 2.5rem;
+            }
+        }
+
+        header p {
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            opacity: 0.8;
+            margin-top: 0.5rem;
+            text-transform: uppercase;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 200px;
+        }
+
+        @media (min-width: 640px) {
+            header p {
+                font-size: 0.875rem;
+                margin-top: 0.75rem;
+            }
+        }
+
+        header > div:last-child {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        @media (min-width: 640px) {
+            header > div:last-child {
+                gap: 0.75rem;
+            }
+        }
+
+        #userBadge {
+            background-color: var(--color-main);
+            color: white;
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-weight: 900;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            white-space: nowrap;
+        }
+
+        @media (min-width: 640px) {
+            #userBadge {
+                font-size: 0.875rem;
+                padding: 0.375rem 0.75rem;
+            }
+        }
+
+        /* 메인 */
+        main {
+            width: 100%;
+            max-width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            position: relative;
+            z-index: 10;
+            padding: 0 1rem 6rem 1rem;
+        }
+
+        @media (min-width: 640px) {
+            main {
+                max-width: 28rem;
+                margin: 0 auto;
+                gap: 1.5rem;
+                padding: 0 0 8rem 0;
+            }
+        }
+
+        /* 네비게이션 바 */
+        nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(var(--rgb-surface), 0.95);
+            backdrop-filter: blur(12px);
+            border-top: 1px solid var(--color-border);
+            padding: 0.5rem 0;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 50;
+            padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+        }
+
+        nav button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+            width: 25%;
+            transition: all 0.3s ease;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            color: inherit;
+            padding: 0.5rem 0;
+        }
+
+        @media (min-width: 640px) {
+            nav button {
+                padding: 0.75rem 0;
+                gap: 0.5rem;
+            }
+        }
+
+        nav button.active {
+            color: var(--color-main);
+            transform: translateY(-4px);
+        }
+
+        nav button.opacity-40 {
+            opacity: 0.4;
+        }
+
+        nav button i {
+            font-size: 1.125rem;
+        }
+
+        @media (min-width: 640px) {
+            nav button i {
+                font-size: 1.25rem;
+            }
+        }
+
+        nav button span {
+            font-size: 0.75rem;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        /* 토스트 */
+        #toastContainer {
+            position: fixed;
+            top: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            width: 90%;
+            max-width: 24rem;
+            pointer-events: none;
+        }
+
+        .toast-message {
+            background-color: var(--color-main);
+            color: white;
+            font-weight: 900;
+            padding: 1rem 1.5rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.2);
+            font-size: 0.875rem;
+            border-radius: 12px;
+            text-align: center;
+            text-transform: uppercase;
+            animation: toastSlide 0.3s ease-out;
+        }
+
+        @keyframes toastSlide {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 미디어 쿼리 */
+        .hidden { display: none; }
+
+        /* 스크롤바 숨김 */
+        ::-webkit-scrollbar {
+            display: none;
+        }
+
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+
+        /* 이미지 미리보기 */
+        .image-preview {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+            margin: 0.5rem 0;
+        }
+
+        /* 댓글 항목 */
+        .reply-item {
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 3px solid var(--color-main);
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+
+        /* 버튼 스타일 */
+        button {
+            font-family: inherit;
+            font-size: inherit;
+        }
+
+        /* 학식 버튼 */
+        .meal-btn {
+            padding: 0.75rem;
+            font-weight: 900;
+            font-size: 0.875rem;
+            border: 2px solid var(--color-main);
+            border-radius: 12px;
+            color: var(--color-main);
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .meal-btn.active {
+            background-color: var(--color-main);
+            color: white;
+            box-shadow: 0 4px 12px rgba(255,0,0,0.2);
+        }
+
+        /* 설정 항목 */
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .setting-item label {
+            font-size: 0.875rem;
+            font-weight: 900;
+            opacity: 0.9;
+        }
+
+        .color-picker {
+            width: 44px;
+            height: 44px;
+            border: 2px solid var(--color-border);
+            border-radius: 10px;
+            cursor: pointer;
+            background: transparent;
+            padding: 2px;
+        }
+
+        /* 범위 슬라이더 */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: var(--color-main);
+            cursor: pointer;
+            margin-top: -8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: var(--color-border);
+            border-radius: 2px;
+        }
+
+        input[type=range]::-moz-range-thumb {
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: var(--color-main);
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        input[type=range]::-moz-range-track {
+            background: var(--color-border);
+            border-radius: 2px;
+            height: 4px;
+            border: none;
+        }
+
+        /* 체크박스 스타일 */
+        input[type="checkbox"] {
+            accent-color: var(--color-main);
+            width: 1rem;
+            height: 1rem;
+            cursor: pointer;
+        }
+
+        input[type="checkbox"] + label {
+            cursor: pointer;
+            transition: all 0.2s;
+            background-color: rgba(0,0,0,0.3);
+            border: 1px solid var(--color-border);
+            padding: 0.5rem;
+            border-radius: 8px;
+            text-transform: uppercase;
+            font-weight: 900;
+            text-align: center;
+            font-size: 0.875rem;
+        }
+
+        input[type="checkbox"]:checked + label {
+            background-color: var(--color-main);
+            color: white;
+            border-color: var(--color-main);
+        }
+
+        /* 그리드 */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 0.5rem;
+        }
+
+        .grid-cols-2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .grid-cols-3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .grid-cols-4 {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        /* Flex */
+        .flex {
+            display: flex;
+        }
+
+        .flex-col {
+            flex-direction: column;
+        }
+
+        .gap-1 { gap: 0.25rem; }
+        .gap-2 { gap: 0.5rem; }
+        .gap-3 { gap: 0.75rem; }
+        .gap-4 { gap: 1rem; }
+        .gap-6 { gap: 1.5rem; }
+
+        .items-center {
+            align-items: center;
+        }
+
+        .items-end {
+            align-items: flex-end;
+        }
+
+        .justify-between {
+            justify-content: space-between;
+        }
+
+        .justify-center {
+            justify-content: center;
+        }
+
+        .justify-around {
+            justify-content: space-around;
+        }
+
+        .flex-1 {
+            flex: 1;
+        }
+
+        /* 기타 */
+        .overflow-hidden {
+            overflow: hidden;
+        }
+
+        .overflow-y-auto {
+            overflow-y: auto;
+        }
+
+        .rounded-lg {
+            border-radius: 0.5rem;
+        }
+
+        .rounded-xl {
+            border-radius: 0.75rem;
+        }
+
+        .rounded-2xl {
+            border-radius: 1rem;
+        }
+
+        .rounded-full {
+            border-radius: 9999px;
+        }
+
+        .border-t-8 {
+            border-top: 8px solid;
+        }
+
+        .border-l-4 {
+            border-left: 4px solid;
+        }
+
+        .border {
+            border: 1px solid;
+        }
+
+        .border-2 {
+            border: 2px solid;
+        }
+
+        .shadow-lg {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .shadow-md {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .shadow-sm {
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+
+        .shadow-xl {
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .shadow-2xl {
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .animate-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+            50% { opacity: 0.5; }
+        }
+
+        .opacity-30 { opacity: 0.3; }
+        .opacity-40 { opacity: 0.4; }
+        .opacity-50 { opacity: 0.5; }
+        .opacity-60 { opacity: 0.6; }
+        .opacity-70 { opacity: 0.7; }
+        .opacity-80 { opacity: 0.8; }
+
+        .text-center { text-align: center; }
+        .text-left { text-align: left; }
+
+        .font-black { font-weight: 900; }
+        .font-bold { font-weight: 700; }
+
+        .uppercase { text-transform: uppercase; }
+        .italic { font-style: italic; }
+
+        .underline { text-decoration: underline; }
+
+        .leading-none { line-height: 1; }
+        .leading-relaxed { line-height: 1.625; }
+
+        .line-clamp-1 {
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .transition-all {
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .transition-colors {
+            transition: color 0.15s, background-color 0.15s;
+        }
+
+        .hover\:opacity-80:hover {
+            opacity: 0.8;
+        }
+
+        .hover\:text-main-theme:hover {
+            color: var(--color-main);
+        }
+
+        .hover\:bg-main-theme:hover {
+            background-color: var(--color-main);
+        }
+
+        .hover\:text-white:hover {
+            color: white;
+        }
+
+        .space-y-4 > :not([hidden]) ~ :not([hidden]) {
+            margin-top: 1rem;
+        }
+
+        .space-y-3 > :not([hidden]) ~ :not([hidden]) {
+            margin-top: 0.75rem;
+        }
+
+        .mb-1 { margin-bottom: 0.25rem; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .mb-3 { margin-bottom: 0.75rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .mb-6 { margin-bottom: 1.5rem; }
+        .mb-8 { margin-bottom: 2rem; }
+
+        .mt-1 { margin-top: 0.25rem; }
+        .mt-2 { margin-top: 0.5rem; }
+        .mt-4 { margin-top: 1rem; }
+        .mt-6 { margin-top: 1.5rem; }
+        .mt-8 { margin-top: 2rem; }
+
+        .mr-2 { margin-right: 0.5rem; }
+
+        .p-1 { padding: 0.25rem; }
+        .p-2 { padding: 0.5rem; }
+        .p-3 { padding: 0.75rem; }
+        .p-4 { padding: 1rem; }
+        .p-5 { padding: 1.25rem; }
+        .p-6 { padding: 1.5rem; }
+        .p-8 { padding: 2rem; }
+
+        .px-1 { padding-left: 0.25rem; padding-right: 0.25rem; }
+        .px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
+        .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
+        .px-4 { padding-left: 1rem; padding-right: 1rem; }
+        .px-5 { padding-left: 1.25rem; padding-right: 1.25rem; }
+        .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+
+        .py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+        .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+        .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+        .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
+
+        .pt-4 { padding-top: 1rem; }
+        .pb-4 { padding-bottom: 1rem; }
+
+        .w-1/4 { width: 25%; }
+        .w-1/2 { width: 50%; }
+        .w-full { width: 100%; }
+
+        .min-h-\[200px\] { min-height: 200px; }
+
+        .text-\[8px\] { font-size: 8px; }
+        .text-\[9px\] { font-size: 9px; }
+        .text-\[10px\] { font-size: 10px; }
+        .text-xs { font-size: 0.75rem; }
+        .text-sm { font-size: 0.875rem; }
+        .text-base { font-size: 1rem; }
+        .text-lg { font-size: 1.125rem; }
+        .text-xl { font-size: 1.25rem; }
+        .text-2xl { font-size: 1.5rem; }
+        .text-3xl { font-size: 1.875rem; }
+        .text-4xl { font-size: 2.25rem; }
+
+        .border-b { border-bottom: 1px solid; }
+        .border-t { border-top: 1px solid; }
+
+        /* Custom background colors */
+        .bg-black\/30 { background-color: rgba(0, 0, 0, 0.3); }
+        .bg-black\/50 { background-color: rgba(0, 0, 0, 0.5); }
+        .bg-main-theme\/5 { background-color: rgba(255, 0, 0, 0.05); }
+        .bg-main-theme\/10 { background-color: rgba(255, 0, 0, 0.1); }
+        .bg-main-theme\/20 { background-color: rgba(255, 0, 0, 0.2); }
+
+        .drop-shadow-md {
+            filter: drop-shadow(0 4px 3px rgba(0, 0, 0, 0.07));
+        }
+
+        .drop-shadow-lg {
+            filter: drop-shadow(0 10px 8px rgba(0, 0, 0, 0.04));
+        }
+
+        .scrollbar-hide {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* 로드 오버레이 애니메이션 */
+        .loading-overlay {
+            animation: fadeInLoading 0.3s ease-out;
+        }
+
+        @keyframes fadeInLoading {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center p-4 pb-32">
 
-    <!-- 스플래시 화면 -->
-    <div id="splashScreen" class="fixed inset-0 bg-black z-[3000] flex flex-col items-center justify-center">
-        <div class="splash-text text-white font-brand text-7xl italic mb-4">scll<span class="text-main-red">.</span></div>
-        <div class="text-[10px] font-black tracking-[0.5em] text-zinc-500 uppercase">System Initializing</div>
-    </div>
+<body>
+    <div id="bg-layer"></div>
+    <div id="bg-blur-layer"></div>
+    <div id="bg-overlay"></div>
 
     <div id="loading" class="loading-overlay">
-        <div class="text-white font-brand text-5xl italic animate-pulse">scll<span class="text-main-red">.</span></div>
+        <div class="text-white font-brand text-4xl sm:text-6xl italic animate-pulse">
+            scll<span class="text-main-theme">.</span>
+        </div>
     </div>
 
-    <header class="w-full max-w-md flex justify-between items-end mb-6 mt-4 border-b-4 border-white pb-4">
+    <header class="px-4 sm:px-0">
         <div>
-            <h1 class="text-5xl font-brand tracking-tighter leading-none italic cursor-pointer" onclick="switchTab('home')">
-                scll<span class="text-main-red">.</span>
-            </h1>
-            <p id="schoolDisplay" class="text-[10px] font-bold tracking-[0.2em] text-zinc-500 mt-2 uppercase italic">Data System V4.0</p>
+            <h1 onclick="switchTab('home')">scll<span class="text-main-theme">.</span></h1>
+            <p id="schoolDisplay">한양대학교사범대학부속중학교</p>
         </div>
-        <button onclick="handlePowerBtn()" class="text-xl hover:text-main-red transition-colors p-2">
-            <i class="fa-solid fa-power-off"></i>
-        </button>
+        <div class="flex gap-2 sm:gap-3 items-center">
+            <span id="userBadge" class="hidden">1-3 siwoomagic</span>
+            <button onclick="handlePowerBtn()" class="text-xl sm:text-2xl hover:text-main-theme transition-colors">
+                <i class="fa-solid fa-power-off"></i>
+            </button>
+        </div>
     </header>
 
-    <main class="w-full max-w-md flex flex-col gap-6">
-
+    <main>
         <!-- HOME TAB -->
-        <div id="tab-home" class="tab-content active gap-6">
-            <div id="allergyAlert" class="hidden bg-main-red text-white p-4 font-black rounded-lg border-2 border-white">
-                <div class="flex items-center gap-2 mb-1 text-sm">
+        <div id="tab-home" class="tab-content active">
+            <div id="allergyAlert" class="hidden bg-main-theme text-white p-4 font-black rounded-xl shadow-lg animate-pulse">
+                <div class="flex items-center gap-2 mb-2 text-base">
                     <i class="fa-solid fa-triangle-exclamation"></i>
                     <span>ALLERGY WARNING</span>
                 </div>
-                <p id="allergyDetailText" class="text-[11px] font-bold leading-tight opacity-90"></p>
+                <p id="allergyDetailText" class="text-xs font-bold leading-relaxed opacity-95"></p>
             </div>
 
-            <div class="w-full" id="searchSection">
-                <div class="relative">
-                    <input type="text" id="schoolSearch" placeholder="학교명 입력 (예: 디미고)" 
-                        class="w-full bg-white text-black font-black py-4 px-6 focus:outline-none border-4 border-main-red placeholder:text-zinc-400 rounded-lg">
-                    <button onclick="searchSchool()" class="absolute right-0 top-0 bottom-0 bg-main-red text-white px-6 active:bg-black transition-colors rounded-r-lg">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                    </button>
-                </div>
-                <div id="searchResults" class="mt-4 flex flex-col gap-1 hidden"></div>
+            <div class="w-full relative shadow-lg rounded-xl">
+                <input type="text" id="schoolSearch" placeholder="학교명 검색" class="input-dark py-3 sm:py-4 px-4 sm:px-6 border-2 border-main-theme text-sm sm:text-base">
+                <button onclick="searchSchool()" class="absolute right-0 top-0 bottom-0 bg-main-theme text-white px-4 sm:px-6 rounded-r-lg font-black"><i class="fa-solid fa-search"></i></button>
             </div>
-
-            <div class="bg-main-red p-6 rounded-xl flex flex-col relative overflow-hidden">
-                <span id="countdownLabel" class="text-white text-[10px] font-black bg-black px-2 py-1 mb-2 w-max italic">AWAITING SYNC</span>
-                <div id="countdown" class="text-5xl font-brand tracking-tight text-white italic">00:00:00</div>
-                <div class="w-full bg-black/20 h-4 mt-4 rounded-full overflow-hidden border border-white/20">
-                    <div id="progressBar" class="h-full bg-white w-0 transition-all duration-1000"></div>
-                </div>
-            </div>
+            <div id="searchResults" class="flex flex-col gap-2 hidden"></div>
 
             <div class="grid grid-cols-3 gap-2">
-                <button onclick="setMealType('1')" data-type="1" class="meal-btn py-3 font-black text-xs border-2 border-white rounded-lg">BREAKFAST</button>
-                <button onclick="setMealType('2')" data-type="2" class="meal-btn py-3 font-black text-xs border-2 border-white bg-white text-black rounded-lg">LUNCH</button>
-                <button onclick="setMealType('3')" data-type="3" class="meal-btn py-3 font-black text-xs border-2 border-white rounded-lg">DINNER</button>
+                <button onclick="setMealType('1')" data-type="1" class="meal-btn">조식</button>
+                <button onclick="setMealType('2')" data-type="2" class="meal-btn">중식</button>
+                <button onclick="setMealType('3')" data-type="3" class="meal-btn active">석식</button>
             </div>
 
-            <div id="mealCard" class="card-flat overflow-hidden border-t-8 border-t-main-red">
-                <div class="p-6 border-b-2 border-zinc-900 flex justify-between items-center bg-zinc-950">
+            <div id="mealCard" class="card-flat overflow-hidden border-t-8 border-main-theme">
+                <div class="p-4 sm:p-6 border-b border-main-theme flex flex-col sm:flex-row justify-between sm:items-center gap-3 sm:gap-0" style="background: rgba(0,0,0,0.4);">
                     <div>
-                        <h2 class="text-3xl font-brand uppercase italic" id="mealTitle">STATUS</h2>
-                        <p class="text-main-red font-black text-sm" id="kcalDisplay">--- KCAL</p>
+                        <h2 class="text-2xl sm:text-3xl font-brand uppercase italic" id="mealTitle">석식</h2>
+                        <p class="text-main-theme font-black text-sm sm:text-base mt-1" id="kcalDisplay">0 KCAL</p>
                     </div>
-                    <div class="flex flex-col items-end">
-                        <span class="bg-main-red px-2 py-1 text-[10px] font-black rounded italic mb-1" id="tierTag">TIER -</span>
-                        <span class="text-[8px] text-zinc-500 font-bold uppercase" id="tierSource">OFFLINE</span>
-                    </div>
+                    <input type="date" id="datePicker" onchange="fetchMealByDate(this.value)" class="bg-black/50 border border-main-theme rounded-lg px-3 py-2 text-xs font-bold text-main-theme outline-none">
                 </div>
-                <div class="p-6">
-                    <ul id="menuList" class="space-y-4">
-                        <li class="text-zinc-600 font-bold italic text-sm">SELECT YOUR SCHOOL TO VIEW MEALS</li>
+                <div class="p-4 sm:p-6 min-h-[200px]">
+                    <ul id="menuList" class="space-y-3 sm:space-y-4">
+                        <li class="opacity-50 italic py-10 text-center font-bold text-sm">해당 식단 정보가 없습니다.</li>
                     </ul>
                 </div>
             </div>
-
-            <div class="flex flex-col gap-2">
-                <span class="text-[10px] font-black text-zinc-500 tracking-widest uppercase italic">Select Date</span>
-                <input type="date" id="datePicker" onchange="fetchMealByDate(this.value)" class="input-dark border-zinc-800">
-            </div>
-
-            <div class="card-flat p-6">
-                <h3 class="text-xl font-brand italic mb-4 uppercase">Nutrition Stats<span class="text-main-red">.</span></h3>
-                <div id="chartContainer" class="flex flex-col gap-4">
-                    <p class="text-zinc-600 italic text-xs text-center font-bold">DATA NOT LOADED</p>
-                </div>
-            </div>
         </div>
 
-        <!-- VOTE TAB -->
-        <div id="tab-vote" class="tab-content gap-6 relative min-h-[550px]">
-            <h2 class="text-5xl font-brand italic">VOTE<span class="text-main-red">.</span></h2>
-
-            <div id="voteLock" class="lock-overlay hidden">
-                <i class="fa-solid fa-lock text-5xl text-main-red mb-4"></i>
-                <p class="font-brand text-3xl italic mb-2">ACCESS DENIED</p>
-                <p class="text-[10px] font-bold text-zinc-400 mb-6 uppercase tracking-widest leading-relaxed">LOGIN REQUIRED TO VOTE AND<br>VIEW COMMUNITY FEEDBACK</p>
-                <button onclick="switchTab('user')" class="bg-white text-black px-8 py-3 font-black rounded-lg text-xs uppercase italic">Go to login</button>
+        <!-- COMM TAB -->
+        <div id="tab-comm" class="tab-content relative min-h-[600px]">
+            <div class="flex justify-between items-end mb-2">
+                <h2 class="text-4xl sm:text-5xl font-brand italic">COMM<span class="text-main-theme">.</span></h2>
             </div>
-            
-            <div class="card-flat p-6 flex flex-col gap-8">
-                <div class="grid grid-cols-2 gap-4">
-                    <button onclick="voteTier('S+')" id="btn-S+" class="vote-btn border-4 border-white text-white p-6 font-brand text-4xl hover:bg-main-red transition-all rounded-xl">S+</button>
-                    <button onclick="voteTier('A')" id="btn-A" class="vote-btn border-4 border-white text-white p-6 font-brand text-4xl hover:bg-main-red transition-all rounded-xl">A</button>
-                    <button onclick="voteTier('B')" id="btn-B" class="vote-btn border-4 border-white text-white p-6 font-brand text-4xl hover:bg-main-red transition-all rounded-xl">B</button>
-                    <button onclick="voteTier('F')" id="btn-F" class="vote-btn border-4 border-white text-white p-6 font-brand text-4xl hover:bg-main-red transition-all rounded-xl">F</button>
-                </div>
-                
-                <div id="statsBars" class="space-y-4 border-t border-zinc-800 pt-6"></div>
 
-                <div class="flex flex-col gap-4 border-t border-zinc-800 pt-6">
-                    <div id="reviewList" class="flex flex-col gap-3 max-h-60 overflow-y-auto"></div>
-                    <div class="flex gap-2">
-                        <input type="text" id="reviewInput" placeholder="LEAVE FEEDBACK" class="input-dark py-2 text-sm">
-                        <button onclick="addReview()" class="bg-main-red text-white px-6 font-black rounded-lg italic text-xs">POST</button>
-                    </div>
+            <div id="commLock" class="hidden absolute inset-0 bg-black/85 z-20 flex flex-col items-center justify-center text-center p-6 rounded-xl backdrop-blur-md">
+                <i class="fa-solid fa-lock text-6xl text-main-theme mb-6"></i>
+                <p class="font-brand text-2xl sm:text-3xl italic mb-3">ACCESS DENIED</p>
+                <p class="text-xs font-bold opacity-70 mb-8 uppercase tracking-widest leading-relaxed">로그인이 필요합니다.</p>
+                <button onclick="switchTab('user')" class="bg-main-theme text-white px-8 sm:px-10 py-3 sm:py-4 font-black rounded-xl text-sm uppercase shadow-lg">인증하러 가기</button>
+            </div>
+
+            <div class="flex p-1 bg-black/50 rounded-xl border border-main-theme shadow-sm">
+                <button onclick="setCommSpace('school')" id="space-school" class="flex-1 py-3 text-[11px] font-black uppercase rounded-lg opacity-50 transition-all">전교생</button>
+                <button onclick="setCommSpace('grade')" id="space-grade" class="flex-1 py-3 text-[11px] font-black uppercase rounded-lg opacity-50 transition-all">우리학년</button>
+                <button onclick="setCommSpace('class')" id="space-class" class="flex-1 py-3 text-[11px] font-black uppercase rounded-lg bg-main-theme text-white shadow-lg transition-all">우리 반</button>
+            </div>
+
+            <div class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                <button onclick="setCommType('notice')" id="type-notice" class="flex-shrink-0 px-4 py-2 text-xs font-black uppercase rounded-full border border-main-theme text-main-theme bg-main-theme/10">알림장</button>
+                <button onclick="setCommType('board')" id="type-board" class="flex-shrink-0 px-4 py-2 text-xs font-black uppercase rounded-full border border-main-theme opacity-60">게시판</button>
+                <button onclick="setCommType('chat')" id="type-chat" class="flex-shrink-0 px-4 py-2 text-xs font-black uppercase rounded-full border border-main-theme opacity-60">잡담방</button>
+                <button onclick="setCommType('news')" id="type-news" class="flex-shrink-0 px-4 py-2 text-xs font-black uppercase rounded-full border border-main-theme opacity-60">공지사항</button>
+            </div>
+
+            <div id="postInputArea" class="card-flat p-4 flex flex-col gap-3">
+                <p id="roleWarningText" class="hidden text-[10px] text-main-theme font-bold bg-main-theme/20 p-2 rounded">알림장은 선생님/반장/부반장만 작성할 수 있습니다.</p>
+                <textarea id="postContent" placeholder="내용을 입력하세요..." class="input-dark py-3 text-sm resize-none h-20"></textarea>
+
+                <div id="imagePreviewArea" class="hidden">
+                    <img id="imagePreview" class="image-preview">
+                    <button type="button" onclick="clearImage()" class="text-[10px] text-main-theme font-bold">이미지 제거</button>
+                </div>
+
+                <input type="file" id="postImage" accept="image/*" class="hidden">
+
+                <div class="flex gap-2">
+                    <button onclick="document.getElementById('postImage').click()" class="border border-main-theme text-main-theme px-4 py-2 rounded-lg text-xs font-black"><i class="fa-solid fa-image"></i> 사진</button>
+                    <button onclick="submitPost()" class="bg-main-theme text-white px-5 font-black rounded-lg text-sm flex-1 shadow-md"><i class="fa-solid fa-paper-plane"></i> 등록</button>
+                </div>
+
+                <div class="flex justify-between items-center px-1" id="anonControlWrap">
+                    <label class="flex items-center gap-2 text-xs font-bold cursor-pointer">
+                        <input type="checkbox" id="postAnon" checked> 익명으로 작성
+                    </label>
+                    <span id="commContextLabel" class="text-[10px] font-black opacity-50 uppercase">우리 반</span>
                 </div>
             </div>
+
+            <div id="postFeed" class="flex flex-col gap-3"></div>
         </div>
 
-        <!-- BURN TAB -->
-        <div id="tab-burn" class="tab-content gap-6 relative min-h-[550px]">
-            <h2 class="text-5xl font-brand italic">BURN<span class="text-main-red">.</span></h2>
+        <!-- MEAL+ TAB -->
+        <div id="tab-mealplus" class="tab-content relative min-h-[700px]">
+            <h2 class="text-4xl sm:text-5xl font-brand italic">MEAL<span class="text-main-theme">+</span></h2>
 
-            <div id="burnLock" class="lock-overlay hidden">
-                <i class="fa-solid fa-lock text-5xl text-main-red mb-4"></i>
-                <p class="font-brand text-3xl italic mb-2">ACCESS DENIED</p>
-                <p class="text-[10px] font-bold text-zinc-400 mb-6 uppercase tracking-widest leading-relaxed">LOGIN REQUIRED TO VOTE AND<br>VIEW COMMUNITY FEEDBACK</p>
-                <button onclick="switchTab('user')" class="bg-white text-black px-8 py-3 font-black rounded-lg text-xs uppercase italic">Go to login</button>
-            </div>
-
-            <div id="burnBanner" class="bg-main-red p-6 rounded-xl border-2 border-white shadow-2xl">
-                <p id="recommendationText" class="text-4xl font-brand text-white italic">OFFLINE</p>
-                <p id="burnIntakeDisplay" class="text-[11px] text-white font-black mt-2 uppercase tracking-tighter opacity-80">LOGIN TO SYNC INTAKE</p>
+            <div class="bg-main-theme p-6 rounded-2xl shadow-xl text-white text-center">
+                <p class="text-[11px] font-black opacity-80 uppercase mb-1">섭취 칼로리 대비 소모량</p>
+                <div class="text-4xl font-brand" id="burnStatusText">급식 정보 없음</div>
+                <p class="text-xs font-bold mt-2 bg-black/30 inline-block px-3 py-1 rounded-full" id="burnRatioText">섭취 0 / 소모 0 KCAL</p>
             </div>
 
             <div class="card-flat p-6 flex flex-col gap-6">
-                <p class="font-black text-[10px] text-zinc-500 uppercase italic">Workout Logger</p>
+                <h3 class="text-lg font-black uppercase text-main-theme border-b border-main-theme pb-2">Workout Tracker</h3>
+
+                <div class="flex flex-col gap-2 ex-item" data-cal="65">
+                    <div class="flex justify-between items-center">
+                        <span class="font-black text-sm"><i class="fa-solid fa-person-running mr-2"></i>러닝</span>
+                        <span class="text-main-theme font-black" id="val-run">0 KM</span>
+                    </div>
+                    <input type="range" id="range-run" min="0" max="20" step="0.5" value="0" class="ex-range">
                 </div>
+
+                <div class="flex flex-col gap-2 ex-item" data-cal="0.4">
+                    <div class="flex justify-between items-center">
+                        <span class="font-black text-sm"><i class="fa-solid fa-dumbbell mr-2"></i>스쿼트</span>
+                        <span class="text-main-theme font-black" id="val-squat">0 REPS</span>
+                    </div>
+                    <input type="range" id="range-squat" min="0" max="500" step="10" value="0" class="ex-range">
+                </div>
+
+                <div class="flex flex-col gap-2 ex-item" data-cal="0.3">
+                    <div class="flex justify-between items-center">
+                        <span class="font-black text-sm"><i class="fa-solid fa-hand-fist mr-2"></i>팔굽혀펴기</span>
+                        <span class="text-main-theme font-black" id="val-push">0 REPS</span>
+                    </div>
+                    <input type="range" id="range-push" min="0" max="300" step="5" value="0" class="ex-range">
+                </div>
+            </div>
+
+            <div id="voteLock" class="hidden absolute inset-0 bg-black/85 z-20 flex flex-col items-center justify-center text-center p-6 rounded-xl backdrop-blur-md">
+                <i class="fa-solid fa-lock text-6xl text-main-theme mb-6"></i>
+                <p class="font-brand text-2xl sm:text-3xl italic mb-3">ACCESS DENIED</p>
+                <p class="text-xs font-bold opacity-70 mb-8">로그인이 필요합니다.</p>
+                <button onclick="switchTab('user')" class="bg-main-theme text-white px-8 sm:px-10 py-3 sm:py-4 font-black rounded-xl text-sm uppercase">인증하러 가기</button>
+            </div>
+
+            <div class="card-flat p-6 shadow-xl text-center">
+                <p class="font-bold text-sm opacity-80 mb-6" id="voteMealName">오늘 석식의 티어는?</p>
+                <div class="grid grid-cols-2 gap-4">
+                    <button onclick="voteTier('S+')" class="vote-btn border-4 border-main-theme p-6 font-brand text-4xl hover:bg-main-theme hover:text-white transition-all rounded-2xl shadow-md">S+</button>
+                    <button onclick="voteTier('A')" class="vote-btn border-4 border-main-theme p-6 font-brand text-4xl hover:bg-main-theme hover:text-white transition-all rounded-2xl shadow-md">A</button>
+                    <button onclick="voteTier('B')" class="vote-btn border-4 border-main-theme p-6 font-brand text-4xl hover:bg-main-theme hover:text-white transition-all rounded-2xl shadow-md">B</button>
+                    <button onclick="voteTier('F')" class="vote-btn border-4 border-main-theme p-6 font-brand text-4xl hover:bg-main-theme hover:text-white transition-all rounded-2xl shadow-md">F</button>
+                </div>
+                <div id="statsBars" class="mt-8 space-y-4 border-t border-main-theme pt-6 text-left"></div>
+            </div>
         </div>
 
-        <!-- USER TAB -->
-        <div id="tab-user" class="tab-content gap-6">
-            <h2 class="text-5xl font-brand italic">USER<span class="text-main-red">.</span></h2>
-            
-            <div id="authSection" class="card-flat p-8 flex flex-col gap-6">
+        <!-- SPACE TAB -->
+        <div id="tab-user" class="tab-content">
+            <h2 class="text-4xl sm:text-5xl font-brand italic">SPACE<span class="text-main-theme">.</span></h2>
+
+            <div id="authSection" class="card-flat p-6 sm:p-8 flex flex-col gap-6 shadow-2xl hidden">
                 <div id="loginForm">
-                    <h3 class="text-2xl font-brand italic mb-4 uppercase">System Login<span class="text-main-red">.</span></h3>
+                    <h3 class="text-xl sm:text-2xl font-brand italic mb-6">로그인</h3>
                     <div class="flex flex-col gap-4">
-                        <input type="text" id="loginId" placeholder="IDENTITY ID" class="input-dark">
-                        <input type="password" id="loginPw" placeholder="PASSWORD" class="input-dark">
-                        <button onclick="handleLogin()" class="bg-main-red text-white py-4 font-black rounded-lg italic uppercase text-sm tracking-widest">Connect</button>
-                        <button onclick="toggleAuth(true)" class="text-zinc-500 text-[10px] uppercase font-bold text-center">Unauthorized? Create Identity</button>
+                        <input type="text" id="loginId" placeholder="아이디" class="input-dark">
+                        <input type="password" id="loginPw" placeholder="비밀번호" class="input-dark">
+                        <button onclick="handleLogin()" class="bg-main-theme text-white py-3 sm:py-4 font-black rounded-xl text-base shadow-lg">접속하기</button>
+                        <button onclick="toggleAuth(true)" class="text-main-theme opacity-80 text-xs font-bold mt-2 underline">계정 새로 만들기</button>
                     </div>
                 </div>
+
                 <div id="signupForm" class="hidden">
-                    <h3 class="text-2xl font-brand italic mb-4 uppercase">New Identity<span class="text-main-red">.</span></h3>
+                    <h3 class="text-xl sm:text-2xl font-brand italic mb-6">계정 생성</h3>
                     <div class="flex flex-col gap-4">
-                        <input type="text" id="regId" placeholder="DESIRED ID" class="input-dark">
-                        <input type="password" id="regPw" placeholder="SECURE PASSWORD" class="input-dark">
-                        <button onclick="handleSignup()" class="bg-white text-black py-4 font-black rounded-lg italic uppercase text-sm tracking-widest">Generate</button>
-                        <button onclick="toggleAuth(false)" class="text-zinc-500 text-[10px] uppercase font-bold text-center">Already Identity? Return</button>
+                        <input type="text" id="regId" placeholder="아이디 (닉네임)" class="input-dark">
+                        <input type="password" id="regPw" placeholder="비밀번호" class="input-dark">
+                        <div class="flex gap-2">
+                            <input type="number" id="regGrade" placeholder="학년" class="input-dark w-1/2">
+                            <input type="number" id="regClass" placeholder="반" class="input-dark w-1/2">
+                        </div>
+                        <select id="regRole" class="input-dark text-sm">
+                            <option value="student">일반 학생</option>
+                            <option value="president">반장/부반장</option>
+                            <option value="teacher">선생님</option>
+                        </select>
+                        <button onclick="handleSignup()" class="border-2 border-main-theme text-main-theme py-3 sm:py-4 font-black rounded-xl hover:bg-main-theme hover:text-white transition-all">가입하기</button>
+                        <button onclick="toggleAuth(false)" class="opacity-60 text-xs font-bold mt-2 underline">돌아가기</button>
                     </div>
                 </div>
             </div>
 
-            <div id="profileSection" class="hidden flex flex-col gap-6">
-                <div class="card-flat p-6 bg-main-red border-none">
-                    <div class="flex justify-between items-center">
-                        <h3 id="displayUserName" class="text-4xl font-brand italic text-white uppercase">USER</h3>
-                        <button onclick="handleLogout()" class="bg-black text-white px-3 py-1 rounded text-[10px] font-black uppercase tracking-tighter">Disconnect</button>
+            <div id="profileSection" class="flex flex-col gap-6">
+                <div class="card-flat p-6 border-l-4 border-l-main-theme overflow-hidden">
+                    <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3">
+                        <div>
+                            <p class="text-xs font-black opacity-70 mb-1" id="displaySchoolName">한양대학교사범대학부속중학교</p>
+                            <h3 class="text-2xl sm:text-3xl font-brand italic" id="displayUserName">siwoomagic</h3>
+                            <p class="text-main-theme font-bold text-sm mt-1" id="displayRoleInfo">⭐ 임원</p>
+                            <p class="font-bold text-xs mt-1" id="displayClassInfo">1학년 3반</p>
+                        </div>
+                        <div class="flex flex-col gap-2">
+                            <button onclick="handleLogout()" class="border border-main-theme bg-black/50 px-3 py-2 rounded-lg text-xs font-black hover:bg-main-theme hover:text-white transition-all">로그아웃</button>
+                            <button onclick="openWithdrawModal()" class="border border-main-theme text-main-theme px-3 py-2 rounded-lg text-xs font-black hover:bg-main-theme hover:text-white transition-all">탈퇴</button>
+                        </div>
                     </div>
                 </div>
 
                 <div class="card-flat p-6">
-                    <h3 class="text-lg font-black mb-4 italic uppercase">Body Configuration</h3>
-                    <div class="grid grid-cols-2 gap-4 mb-6">
-                        <div class="flex flex-col gap-1">
-                            <label class="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Height (cm)</label>
-                            <input type="number" id="u-height" class="input-dark py-2 text-sm" value="175" onchange="saveStats()">
-                        </div>
-                        <div class="flex flex-col gap-1">
-                            <label class="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Weight (kg)</label>
-                            <input type="number" id="u-weight" class="input-dark py-2 text-sm" value="70" onchange="saveStats()">
-                        </div>
-                    </div>
-                    <h3 class="text-lg font-black mb-4 italic uppercase border-t border-zinc-800 pt-6">Allergy Filters</h3>
-                    <div id="allergySet" class="grid grid-cols-2 gap-2"></div>
+                    <h3 class="text-lg font-black mb-4"><i class="fa-solid fa-shield-virus text-main-theme"></i> 알레르기</h3>
+                    <div id="allergySet" class="grid grid-cols-4 gap-2"></div>
                 </div>
 
-                <!-- 추가된 데이터 관리 섹션 -->
-                <div class="card-flat p-6 border-zinc-800">
-                    <h3 class="text-lg font-black mb-4 italic uppercase">System Data Management</h3>
-                    <p class="text-[9px] font-bold text-zinc-500 mb-4 leading-relaxed">
-                        JSON 포맷으로 데이터를 내보내거나 백업할 수 있습니다.<br>
-                        이 파일은 나중에 서버 구축 시 데이터베이스 초기값으로 사용 가능합니다.
-                    </p>
-                    <div class="grid grid-cols-1 gap-2">
-                        <button onclick="exportToJson()" class="w-full bg-zinc-900 border-2 border-white text-white py-3 font-black rounded-lg text-[10px] uppercase italic hover:bg-white hover:text-black transition-all">
-                            Export System Data (.json)
-                        </button>
+                <div class="card-flat p-6 border border-main-theme shadow-lg">
+                    <div class="flex justify-between items-end mb-6 border-b border-main-theme pb-4">
+                        <div>
+                            <h3 class="text-lg sm:text-xl font-brand italic text-main-theme">THEME ENGINE</h3>
+                            <p class="text-[10px] font-bold opacity-60 mt-1">나만의 테마</p>
+                        </div>
+                        <i class="fa-solid fa-palette text-2xl sm:text-3xl text-main-theme opacity-50"></i>
                     </div>
+
+                    <div class="flex justify-between items-center py-3 border-b border-main-theme">
+                        <label class="text-xs sm:text-sm font-black opacity-90">포인트 컬러</label>
+                        <input type="color" id="themeMain" class="color-picker">
+                    </div>
+                    <div class="flex justify-between items-center py-3 border-b border-main-theme">
+                        <label class="text-xs sm:text-sm font-black opacity-90">배경 컬러</label>
+                        <input type="color" id="themeBg" class="color-picker">
+                    </div>
+                    <div class="flex justify-between items-center py-3 border-b border-main-theme">
+                        <label class="text-xs sm:text-sm font-black opacity-90">카드 컬러</label>
+                        <input type="color" id="themeSurface" class="color-picker">
+                    </div>
+
+                    <div class="flex flex-col gap-2 py-4 border-b border-main-theme">
+                        <label class="text-xs sm:text-sm font-black opacity-90">폰트</label>
+                        <select id="themeFontTitle" class="input-dark py-2 text-xs sm:text-sm">
+                            <option value="'Black Han Sans', sans-serif">Black Han Sans</option>
+                            <option value="'Pretendard', sans-serif">Pretendard</option>
+                            <option value="'Dongle', sans-serif">동글체</option>
+                            <option value="'Jua', sans-serif">주아체</option>
+                        </select>
+                    </div>
+
+                    <div class="bg-black/30 p-4 rounded-xl mt-4 border border-main-theme">
+                        <label class="block text-xs font-black text-main-theme mb-4"><i class="fa-solid fa-image"></i> 배경 이미지</label>
+                        <input type="text" id="themeBgImg" placeholder="이미지 URL" class="input-dark py-2 text-xs mb-4">
+
+                        <div class="flex flex-col gap-4">
+                            <div>
+                                <div class="flex justify-between text-[10px] font-bold mb-1">
+                                    <span>가림막</span>
+                                    <span id="lblOverlay">0%</span>
+                                </div>
+                                <input type="range" id="themeOverlay" min="0" max="1" step="0.05">
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-[10px] font-bold mb-1">
+                                    <span>블러</span>
+                                    <span id="lblBlur">0px</span>
+                                </div>
+                                <input type="range" id="themeBlur" min="0" max="20" step="1">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="ThemeManager.reset()" class="w-full bg-black border border-main-theme text-white py-3 rounded-xl text-xs font-black uppercase hover:border-main-theme transition-all mt-6">초기화</button>
                 </div>
+
+                <div class="text-center opacity-30 text-[10px] font-black uppercase tracking-widest">scll Core V5.1</div>
             </div>
         </div>
-
     </main>
 
-    <nav class="fixed bottom-0 left-0 right-0 bg-black border-t-4 border-white p-4 flex justify-around items-center z-50">
-        <button onclick="switchTab('home')" id="nav-home" class="nav-btn text-main-red flex flex-col items-center gap-1 w-1/4">
-            <i class="fa-solid fa-house text-xl"></i>
-            <span class="text-[9px] font-black uppercase">Home</span>
+    <!-- 탈퇴 모달 -->
+    <div id="withdrawModal" class="modal-overlay">
+        <div class="modal-content">
+            <h2 class="text-2xl font-brand text-main-theme mb-4"><i class="fa-solid fa-triangle-exclamation"></i> 계정 탈퇴</h2>
+            <p class="text-sm mb-6 opacity-80">정말로 탈퇴하시겠습니까?</p>
+            <div class="flex gap-3">
+                <button onclick="closeWithdrawModal()" class="flex-1 border border-main-theme py-3 rounded-lg font-black text-sm hover:opacity-80">취소</button>
+                <button onclick="handleWithdraw()" class="flex-1 bg-main-theme text-white py-3 rounded-lg font-black text-sm shadow-lg">탈퇴하기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 댓글 모달 -->
+    <div id="repliesModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4 border-b border-main-theme pb-4">
+                <h2 class="text-xl font-brand text-main-theme">댓글</h2>
+                <button onclick="closeRepliesModal()" class="text-2xl opacity-50 hover:opacity-100"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="repliesList" class="flex flex-col gap-3 mb-6 max-h-96 overflow-y-auto"></div>
+            <div class="flex flex-col gap-2 border-t border-main-theme pt-4">
+                <textarea id="replyContent" placeholder="댓글을 입력하세요..." class="input-dark py-2 text-sm resize-none h-16"></textarea>
+                <button onclick="submitReply()" class="bg-main-theme text-white py-2 rounded-lg font-black text-sm">등록</button>
+            </div>
+        </div>
+    </div>
+
+    <nav>
+        <button onclick="switchTab('home')" id="nav-home" class="active text-main-theme">
+            <i class="fa-solid fa-utensils"></i>
+            <span>Meal</span>
         </button>
-        <button onclick="switchTab('vote')" id="nav-vote" class="nav-btn text-white opacity-30 flex flex-col items-center gap-1 w-1/4">
-            <i class="fa-solid fa-chart-simple text-xl"></i>
-            <span class="text-[9px] font-black uppercase">Vote</span>
+        <button onclick="switchTab('comm')" id="nav-comm" class="opacity-40">
+            <i class="fa-solid fa-layer-group"></i>
+            <span>Comm</span>
         </button>
-        <button onclick="switchTab('burn')" id="nav-burn" class="nav-btn text-white opacity-30 flex flex-col items-center gap-1 w-1/4">
-            <i class="fa-solid fa-fire text-xl"></i>
-            <span class="text-[9px] font-black uppercase">Burn</span>
+        <button onclick="switchTab('mealplus')" id="nav-mealplus" class="opacity-40">
+            <i class="fa-solid fa-star"></i>
+            <span>Meal+</span>
         </button>
-        <button onclick="switchTab('user')" id="nav-user" class="nav-btn text-white opacity-30 flex flex-col items-center gap-1 w-1/4">
-            <i class="fa-solid fa-user-gear text-xl"></i>
-            <span class="text-[9px] font-black uppercase">User</span>
+        <button onclick="switchTab('user')" id="nav-user" class="opacity-40">
+            <i class="fa-solid fa-user-astronaut"></i>
+            <span>Space</span>
         </button>
     </nav>
 
-    <div id="toastContainer" class="fixed top-4 left-1/2 -translate-x-1/2 z-[100] flex flex-col gap-2 w-[80%] max-w-xs"></div>
+    <div id="toastContainer"></div>
 
     <script>
-        const API_KEY = "";
-        const ABBR = { 
-            "디미고": "한국디지털미디어고등학교", "한대부중": "한양대학교사범대학부속중학교", "한대부고": "한양대학교사범대학부속고등학교",
-            "선린": "선린인터넷고등학교", "대마고": "대덕소프트웨어마이스터고등학교", "보인고": "보인고등학교"
+        // ========== 유틸리티 ==========
+        function hexToRgb(hex) {
+            let r = 0, g = 0, b = 0;
+            if (hex.length == 4) { r = "0x" + hex[1] + hex[1]; g = "0x" + hex[2] + hex[2]; b = "0x" + hex[3] + hex[3]; }
+            else if (hex.length == 7) { r = "0x" + hex[1] + hex[2]; g = "0x" + hex[3] + hex[4]; b = "0x" + hex[5] + hex[6]; }
+            return `${+r}, ${+g}, ${+b}`;
+        }
+
+        function showLoading(v) {
+            document.getElementById('loading').classList.toggle('active', v);
+        }
+
+        function showToast(m) {
+            const container = document.getElementById('toastContainer');
+            const t = document.createElement('div');
+            t.className = "toast-message";
+            t.innerText = m;
+            container.appendChild(t);
+            setTimeout(() => {
+                t.style.opacity = '0';
+                t.style.transform = 'translateY(-20px)';
+                setTimeout(() => t.remove(), 300);
+            }, 2500);
+        }
+
+        // ========== 테마 엔진 ==========
+        const ThemeManager = {
+            getDefaults: () => ({
+                main: '#E50914', bg: '#000000', surface: '#141414',
+                fontTitle: "'Black Han Sans', sans-serif", bgImg: '', overlay: '0.6', blur: '0'
+            }),
+            apply: function() {
+                const config = JSON.parse(localStorage.getItem('scll_theme')) || this.getDefaults();
+                const root = document.documentElement;
+
+                root.style.setProperty('--color-main', config.main);
+                root.style.setProperty('--color-bg', config.bg);
+                root.style.setProperty('--color-surface', config.surface);
+                root.style.setProperty('--rgb-surface', hexToRgb(config.surface));
+                root.style.setProperty('--font-title', config.fontTitle);
+                root.style.setProperty('--font-body', config.fontTitle === "'Black Han Sans', sans-serif" ? "'Pretendard', sans-serif" : config.fontTitle);
+                root.style.setProperty('--bg-image', config.bgImg ? `url('${config.bgImg}')` : 'none');
+                root.style.setProperty('--bg-overlay-opacity', config.bgImg ? config.overlay : '0');
+                root.style.setProperty('--bg-blur', `${config.blur}px`);
+
+                if(document.getElementById('themeMain')) {
+                    document.getElementById('themeMain').value = config.main;
+                    document.getElementById('themeBg').value = config.bg;
+                    document.getElementById('themeSurface').value = config.surface;
+                    document.getElementById('themeFontTitle').value = config.fontTitle;
+                    document.getElementById('themeBgImg').value = config.bgImg || '';
+                    document.getElementById('themeOverlay').value = config.overlay;
+                    document.getElementById('themeBlur').value = config.blur;
+                    document.getElementById('lblOverlay').innerText = Math.round(config.overlay * 100) + '%';
+                    document.getElementById('lblBlur').innerText = config.blur + 'px';
+                }
+            },
+            update: function(key, val) {
+                const config = JSON.parse(localStorage.getItem('scll_theme')) || this.getDefaults();
+                config[key] = val;
+                localStorage.setItem('scll_theme', JSON.stringify(config));
+                this.apply();
+            },
+            reset: function() {
+                localStorage.removeItem('scll_theme');
+                this.apply();
+                showToast("테마가 초기화되었습니다.");
+            },
+            initEvents: function() {
+                document.getElementById('themeMain').addEventListener('input', e => this.update('main', e.target.value));
+                document.getElementById('themeBg').addEventListener('input', e => this.update('bg', e.target.value));
+                document.getElementById('themeSurface').addEventListener('input', e => this.update('surface', e.target.value));
+                document.getElementById('themeFontTitle').addEventListener('change', e => this.update('fontTitle', e.target.value));
+                document.getElementById('themeBgImg').addEventListener('change', e => this.update('bgImg', e.target.value));
+                document.getElementById('themeOverlay').addEventListener('input', e => {
+                    this.update('overlay', e.target.value);
+                    document.getElementById('lblOverlay').innerText = Math.round(e.target.value * 100) + '%';
+                });
+                document.getElementById('themeBlur').addEventListener('input', e => {
+                    this.update('blur', e.target.value);
+                    document.getElementById('lblBlur').innerText = e.target.value + 'px';
+                });
+            }
         };
-        const ALLERGIES = ["난류", "우유", "메밀", "땅콩", "대두", "밀", "고등어", "게", "새우", "돼지고기", "복숭아", "토마토", "아황산류", "호두", "닭고기", "쇠고기", "오징어", "조개류", "잣"];
+
+        // ========== 전역 상태 ==========
+        const API_KEY = "";
+        const ALLERGIES = ["난류", "우유", "메밀", "땅콩", "대두", "밀", "고등어", "게", "새우", "돼지", "복숭아", "토마토", "아황산", "호두", "닭고기", "쇠고기", "오징어", "조개류", "잣"];
 
         let currentSchool = JSON.parse(localStorage.getItem('scll_school')) || null;
         let isLoggedIn = false;
@@ -279,38 +1273,58 @@
         let currentMealType = '2';
         let cachedMeals = {};
         let selectedDate = new Date().toISOString().split('T')[0].replace(/-/g, '');
+        let currentIntakeKcal = 0;
+        let currentCommSpace = 'class';
+        let currentCommType = 'notice';
+        let selectedPostId = null;
+        let currentImageData = null;
 
-        window.onload = function() {
-            // 스플래시 화면 제어: 페이드 효과 적용
-            setTimeout(() => {
-                const splash = document.getElementById('splashScreen');
-                splash.style.opacity = '0';
-                setTimeout(() => splash.remove(), 800);
-            }, 2500);
-
+        window.addEventListener('load', function() {
+            ThemeManager.apply();
+            ThemeManager.initEvents();
             initAllergyUI();
             checkAuth();
             autoMealType();
-            
+
             if (currentSchool) {
                 document.getElementById('schoolDisplay').innerText = currentSchool.name;
                 fetchMeal();
             }
-            setInterval(updateCountdown, 1000);
-            document.querySelectorAll('.ex-range').forEach(el => el.oninput = calculateBurn);
-        };
 
-        // --- AUTH LOGIC ---
+            document.querySelectorAll('.ex-range').forEach(el => {
+                el.addEventListener('input', calculateBurn);
+            });
+
+            document.getElementById('postImage').addEventListener('change', handleImageUpload);
+            showLoading(false);
+        });
+
+        function switchTab(id) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-' + id).classList.add('active');
+
+            document.querySelectorAll('nav button').forEach(el => {
+                el.classList.add('opacity-40');
+                el.classList.remove('active', 'text-main-theme');
+            });
+            const nav = document.getElementById('nav-' + id);
+            nav.classList.remove('opacity-40');
+            nav.classList.add('active', 'text-main-theme');
+
+            if (id === 'comm') renderCommunity();
+            if (id === 'mealplus') { calculateBurn(); renderVote(); }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ========== 인증 ==========
         function checkAuth() {
             const session = JSON.parse(localStorage.getItem('scll_session'));
             if (session) {
                 isLoggedIn = true;
                 currentUser = session;
-                document.getElementById('u-height').value = currentUser.stats.height;
-                document.getElementById('u-weight').value = currentUser.stats.weight;
                 updateAuthUI();
             } else {
-                updateAuthUI(); // 초기 잠금 상태 적용
+                updateAuthUI();
             }
         }
 
@@ -322,12 +1336,19 @@
         function handleSignup() {
             const id = document.getElementById('regId').value.trim();
             const pw = document.getElementById('regPw').value.trim();
-            if (!id || !pw) return showToast("IDENTITY DATA EMPTY");
+            const grade = document.getElementById('regGrade').value.trim();
+            const cls = document.getElementById('regClass').value.trim();
+            const role = document.getElementById('regRole').value;
+
+            if (!id || !pw || !grade || !cls) return showToast("모든 정보를 입력해주세요.");
+            if (!currentSchool) return showToast("HOME에서 학교를 검색해주세요.");
+
             const users = JSON.parse(localStorage.getItem('scll_users') || "{}");
-            if (users[id]) return showToast("IDENTITY ALREADY EXISTS");
-            users[id] = { id, pw, stats: { height: 175, weight: 70 }, allergies: [] };
+            if (users[id]) return showToast("이미 존재하는 닉네임입니다.");
+
+            users[id] = { id, pw, grade, classNum: cls, role, allergies: [], schoolCode: currentSchool.code, schoolName: currentSchool.name };
             localStorage.setItem('scll_users', JSON.stringify(users));
-            showToast("IDENTITY GENERATED");
+            showToast("계정이 생성되었습니다!");
             toggleAuth(false);
         }
 
@@ -335,18 +1356,19 @@
             const id = document.getElementById('loginId').value.trim();
             const pw = document.getElementById('loginPw').value.trim();
             const users = JSON.parse(localStorage.getItem('scll_users') || "{}");
+
             if (users[id] && users[id].pw === pw) {
                 isLoggedIn = true;
                 currentUser = users[id];
                 localStorage.setItem('scll_session', JSON.stringify(currentUser));
                 updateAuthUI();
-                showToast(`CONNECTED: ${id}`);
-                // 로그인 후 현재 탭 갱신
-                const activeTab = document.querySelector('.tab-content.active').id.split('-')[1];
-                if(activeTab === 'vote') renderVote();
-                if(activeTab === 'burn') calculateBurn();
+                syncAllergyCheckboxes();
+                showToast(`환영합니다, ${id}님!`);
+                document.getElementById('loginId').value = '';
+                document.getElementById('loginPw').value = '';
+                if(document.querySelector('.tab-content.active').id === 'tab-comm') renderCommunity();
             } else {
-                showToast("INVALID CREDENTIALS");
+                showToast("정보가 일치하지 않습니다.");
             }
         }
 
@@ -355,74 +1377,100 @@
             currentUser = null;
             localStorage.removeItem('scll_session');
             updateAuthUI();
-            showToast("DISCONNECTED");
-            switchTab('home'); // 로그아웃 시 홈으로 이동
+            showToast("로그아웃되었습니다.");
+            switchTab('home');
+        }
+
+        function openWithdrawModal() {
+            document.getElementById('withdrawModal').classList.add('active');
+        }
+
+        function closeWithdrawModal() {
+            document.getElementById('withdrawModal').classList.remove('active');
+        }
+
+        function handleWithdraw() {
+            const users = JSON.parse(localStorage.getItem('scll_users') || "{}");
+            delete users[currentUser.id];
+            localStorage.setItem('scll_users', JSON.stringify(users));
+            localStorage.removeItem('scll_session');
+            isLoggedIn = false;
+            currentUser = null;
+            updateAuthUI();
+            closeWithdrawModal();
+            showToast("계정이 삭제되었습니다.");
+            switchTab('home');
         }
 
         function updateAuthUI() {
             const authSec = document.getElementById('authSection');
             const profSec = document.getElementById('profileSection');
-            const voteLock = document.getElementById('voteLock');
-            const burnLock = document.getElementById('burnLock');
+            const locks = [document.getElementById('commLock'), document.getElementById('voteLock')];
+            const badge = document.getElementById('userBadge');
 
             if (isLoggedIn) {
                 authSec.classList.add('hidden');
                 profSec.classList.remove('hidden');
-                voteLock.classList.add('hidden');
-                burnLock.classList.add('hidden');
+                locks.forEach(l => l?.classList.add('hidden'));
+
+                let roleStr = currentUser.role === 'president' ? '⭐ 임원' : (currentUser.role === 'teacher' ? '👨‍🏫 교사' : '🧑‍🎓 학생');
+
                 document.getElementById('displayUserName').innerText = currentUser.id;
+                document.getElementById('displayRoleInfo').innerText = roleStr;
+                document.getElementById('displayClassInfo').innerText = `${currentUser.grade}학년 ${currentUser.classNum}반`;
+                document.getElementById('displaySchoolName').innerText = currentUser.schoolName || '학교 미설정';
+
+                badge.innerText = `${currentUser.grade}-${currentUser.classNum} ${currentUser.id}`;
+                badge.classList.remove('hidden');
             } else {
                 authSec.classList.remove('hidden');
                 profSec.classList.add('hidden');
-                voteLock.classList.remove('hidden');
-                burnLock.classList.remove('hidden');
+                locks.forEach(l => l?.classList.remove('hidden'));
+                badge.classList.add('hidden');
             }
         }
 
-        // --- CORE FUNCTIONALITY ---
-        function switchTab(id) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.getElementById('tab-' + id).classList.add('active');
-            document.querySelectorAll('.nav-btn').forEach(el => {
-                el.classList.add('opacity-30'); el.classList.remove('text-main-red');
-            });
-            document.getElementById('nav-' + id).classList.remove('opacity-30');
-            document.getElementById('nav-' + id).classList.add('text-main-red');
-            
-            if (id === 'vote') renderVote();
-            if (id === 'burn') calculateBurn();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
+        // ========== 급식 ==========
         async function searchSchool() {
             let query = document.getElementById('schoolSearch').value.trim();
             if (!query) return;
-            if (ABBR[query]) query = ABBR[query];
             showLoading(true);
             try {
                 const res = await fetch(`https://open.neis.go.kr/hub/schoolInfo?KEY=${API_KEY}&Type=json&SCHUL_NM=${query}`);
                 const data = await res.json();
                 if (data.schoolInfo) displaySchools(data.schoolInfo[1].row);
-                else showToast("SCHOOL NOT FOUND");
-            } catch (e) { showToast("NETWORK ERROR"); } finally { showLoading(false); }
+                else showToast("검색 결과가 없습니다.");
+            } catch (e) { showToast("네트워크 오류"); } finally { showLoading(false); }
         }
 
         function displaySchools(list) {
             const resContainer = document.getElementById('searchResults');
-            resContainer.innerHTML = ''; resContainer.classList.remove('hidden');
+            resContainer.innerHTML = '';
+            resContainer.classList.remove('hidden');
             list.forEach(s => {
                 const b = document.createElement('button');
-                b.className = "w-full text-left bg-zinc-900 p-4 border-l-4 border-main-red font-black text-[10px] uppercase mb-1 rounded hover:bg-zinc-800";
+                b.className = "w-full text-left bg-black/50 p-4 border-l-4 border-l-main-theme font-black text-xs mb-1 rounded-xl shadow-md";
                 b.innerText = `[${s.LCTN_SC_NM}] ${s.SCHUL_NM}`;
+                b.style.borderColor = 'var(--color-main)';
                 b.onclick = () => {
                     currentSchool = { atpt: s.ATPT_OFCDC_SC_CODE, code: s.SD_SCHUL_CODE, name: s.SCHUL_NM };
                     localStorage.setItem('scll_school', JSON.stringify(currentSchool));
                     document.getElementById('schoolDisplay').innerText = s.SCHUL_NM;
                     resContainer.classList.add('hidden');
                     fetchMeal();
+                    if(isLoggedIn) { currentUser.schoolCode = s.SD_SCHUL_CODE; currentUser.schoolName = s.SCHUL_NM; saveUser(); }
                 };
                 resContainer.appendChild(b);
             });
+        }
+
+        function setMealType(t) {
+            currentMealType = t;
+            document.querySelectorAll('.meal-btn').forEach(b => {
+                if(b.dataset.type === t) { b.classList.add('active'); }
+                else { b.classList.remove('active'); }
+            });
+            if(cachedMeals[t]) renderMeal(t); else fetchMeal();
         }
 
         async function fetchMeal(date = selectedDate) {
@@ -436,13 +1484,12 @@
                     data.mealServiceDietInfo[1].row.forEach(m => cachedMeals[m.MMEAL_SC_CODE] = m);
                 }
                 renderMeal(currentMealType);
-            } catch (e) { showToast("SYNC FAILED"); } finally { showLoading(false); }
+            } catch (e) { showToast("데이터 동기화 실패"); } finally { showLoading(false); }
         }
 
         async function fetchMealByDate(date) {
             selectedDate = date.replace(/-/g, '');
             await fetchMeal(selectedDate);
-            showToast(`SYNCED: ${date}`);
         }
 
         function renderMeal(type) {
@@ -451,17 +1498,22 @@
             const alertBox = document.getElementById('allergyAlert');
             alertBox.classList.add('hidden');
 
-            document.getElementById('mealTitle').innerText = (type==='1'?'BREAKFAST':type==='2'?'LUNCH':'DINNER');
+            const titleStr = type==='1'?'조식':type==='2'?'중식':'석식';
+            document.getElementById('mealTitle').innerText = titleStr;
+            document.getElementById('voteMealName').innerText = `오늘 ${titleStr}의 티어는?`;
 
             if (!m) {
-                list.innerHTML = `<li class="text-zinc-600 italic py-10 text-center uppercase font-black text-xs">No Data for this meal</li>`;
+                list.innerHTML = `<li class="opacity-50 italic py-10 text-center font-bold text-sm">해당 식단 정보가 없습니다.</li>`;
                 document.getElementById('kcalDisplay').innerText = "0 KCAL";
-                document.getElementById('chartContainer').innerHTML = `<p class="text-zinc-600 italic text-xs text-center font-bold">NO NUTRITION DATA</p>`;
-                updateTierDisplay();
+                currentIntakeKcal = 0;
+                calculateBurn();
                 return;
             }
 
             document.getElementById('kcalDisplay').innerText = m.CAL_INFO;
+            currentIntakeKcal = parseFloat(m.CAL_INFO) || 0;
+            calculateBurn();
+
             const items = m.DDISH_NM.split('<br/>');
             const myAlgs = isLoggedIn ? currentUser.allergies : [];
             let detected = [];
@@ -470,301 +1522,314 @@
                 const clean = item.replace(/\([0-9\.]+\)/g, '').trim();
                 let isDanger = false;
                 myAlgs.forEach(a => { if (item.includes(a)) isDanger = true; });
-                if (isDanger) {
-                    const match = item.match(/\(([^)]+)\)/);
-                    detected.push(`${clean} (${match ? match[1] : 'Check'})`);
-                }
-                
-                return `
-                <li class="flex items-center gap-4 ${isDanger ? 'bg-main-red/20 p-3 rounded-lg border-l-4 border-main-red' : ''}">
-                    <span class="text-main-red font-black italic text-xs">${String(i+1).padStart(2, '0')}</span>
-                    <span class="font-bold flex-1 text-sm ${isDanger ? 'text-main-red' : ''}">${clean}</span>
+                if (isDanger) detected.push(clean);
+
+                return `<li class="flex items-center gap-4 ${isDanger ? 'bg-main-theme/20 p-3 rounded-lg border-l-4 border-main-theme' : ''}">
+                    <span class="text-main-theme font-black italic">${String(i+1).padStart(2, '0')}</span>
+                    <span class="font-bold flex-1 text-base ${isDanger ? 'text-main-theme' : ''}">${clean}</span>
                 </li>`;
             }).join('');
 
             if (detected.length > 0) {
                 alertBox.classList.remove('hidden');
-                document.getElementById('allergyDetailText').innerText = detected.join(', ');
+                document.getElementById('allergyDetailText').innerText = `${detected.join(', ')}에 알레르기 물질 포함!`;
             }
-            updateTierDisplay();
-            renderNutrients(m);
         }
 
-        function renderNutrients(m) {
-            const container = document.getElementById('chartContainer');
-            const ntr = m.NTR_INFO.split('<br/>');
-            container.innerHTML = ntr.map(n => {
-                const [name, val] = n.split(':');
-                if (!name || !val) return '';
-                const numVal = parseFloat(val);
-                const p = Math.min(100, (numVal / 120) * 100); // 120g 기준 비중 계산
-                return `
-                <div class="flex flex-col gap-1">
-                    <div class="flex justify-between text-[9px] font-black uppercase text-zinc-500">
-                        <span>${name}</span><span class="text-main-red">${val}</span>
-                    </div>
-                    <div class="w-full bg-zinc-900 h-1 rounded-full"><div class="bg-main-red h-full bar-anim" style="width:${p}%"></div></div>
-                </div>`;
-            }).join('');
+        function autoMealType() {
+            const h = new Date().getHours();
+            if (h < 9) setMealType('1');
+            else if (h < 14) setMealType('2');
+            else setMealType('3');
         }
 
-        // --- VOTE & COMMUNITY ---
-        function voteTier(tier) {
-            if (!isLoggedIn) return showToast("LOGIN REQUIRED");
-            const key = `${currentSchool.code}_${selectedDate}_${currentMealType}`;
-            let allVotes = JSON.parse(localStorage.getItem('scll_all_votes') || "{}");
-            let myVotes = JSON.parse(localStorage.getItem('scll_my_votes') || "{}");
-            
-            if (myVotes[key]) {
-                const old = myVotes[key];
-                if (old === tier) return;
-                allVotes[key][old] = Math.max(0, allVotes[key][old] - 1);
-            }
-            if (!allVotes[key]) allVotes[key] = { "S+": 0, "A": 0, "B": 0, "F": 0 };
-            allVotes[key][tier]++;
-            myVotes[key] = tier;
-            localStorage.setItem('scll_all_votes', JSON.stringify(allVotes));
-            localStorage.setItem('scll_my_votes', JSON.stringify(myVotes));
-            renderVote();
-            updateTierDisplay();
-            showToast(`VOTED: ${tier}`);
+        // ========== 커뮤니티 ==========
+        function setCommSpace(space) {
+            currentCommSpace = space;
+            ['school', 'grade', 'class'].forEach(s => {
+                const el = document.getElementById(`space-${s}`);
+                if (s === space) { el.classList.remove('opacity-50'); el.classList.add('bg-main-theme', 'text-white'); }
+                else { el.classList.add('opacity-50'); el.classList.remove('bg-main-theme', 'text-white'); }
+            });
+            renderCommunity();
         }
 
-        function renderVote() {
+        function setCommType(type) {
+            currentCommType = type;
+            ['notice', 'board', 'chat', 'news'].forEach(t => {
+                const el = document.getElementById(`type-${t}`);
+                if (t === type) { el.classList.add('text-main-theme', 'bg-main-theme/10'); el.classList.remove('opacity-60'); }
+                else { el.classList.remove('text-main-theme', 'bg-main-theme/10'); el.classList.add('opacity-60'); }
+            });
+            renderCommunity();
+        }
+
+        function renderCommunity() {
             if (!isLoggedIn) return;
-            const key = `${currentSchool?.code}_${selectedDate}_${currentMealType}`;
-            const allVotes = JSON.parse(localStorage.getItem('scll_all_votes') || "{}");
-            const v = allVotes[key] || { "S+": 0, "A": 0, "B": 0, "F": 0 };
-            const total = Object.values(v).reduce((a, b) => a + b, 0) || 1;
-            
-            document.getElementById('statsBars').innerHTML = Object.entries(v).map(([t, count]) => {
-                const p = (count / total * 100).toFixed(0);
-                return `
-                <div class="flex flex-col gap-1">
-                    <div class="flex justify-between text-[9px] font-black uppercase text-zinc-400"><span>${t} TIER</span><span>${p}%</span></div>
-                    <div class="w-full bg-zinc-900 h-1.5 rounded-full overflow-hidden"><div class="bg-main-red h-full bar-anim" style="width:${p}%"></div></div>
-                </div>`;
-            }).join('');
-            renderReviews();
-        }
 
-        function addReview() {
-            if (!isLoggedIn) return showToast("LOGIN REQUIRED");
-            const input = document.getElementById('reviewInput');
-            const text = input.value.trim();
-            if (!text) return;
-            const key = `${currentSchool.code}_${selectedDate}_${currentMealType}`;
-            const reviews = JSON.parse(localStorage.getItem('scll_reviews') || "{}");
-            if (!reviews[key]) reviews[key] = [];
-            reviews[key].push({ id: currentUser.id, text: text, time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) });
-            localStorage.setItem('scll_reviews', JSON.stringify(reviews));
-            input.value = '';
-            renderReviews();
-            showToast("FEEDBACK POSTED");
-        }
+            const inputWrap = document.getElementById('inputControlWrap');
+            const anonWrap = document.getElementById('anonControlWrap');
+            const warnText = document.getElementById('roleWarningText');
 
-        function renderReviews() {
-            const key = `${currentSchool?.code}_${selectedDate}_${currentMealType}`;
-            const reviews = (JSON.parse(localStorage.getItem('scll_reviews') || "{}"))[key] || [];
-            const list = document.getElementById('reviewList');
-            if(reviews.length === 0) {
-                list.innerHTML = `<p class="text-zinc-700 italic text-center py-4 text-[10px] font-black uppercase tracking-widest">No Feedback Yet</p>`;
+            if (currentCommType === 'notice') {
+                anonWrap.classList.add('hidden');
+                if (currentUser.role === 'student') {
+                    inputWrap.classList.add('hidden');
+                    warnText.classList.remove('hidden');
+                } else {
+                    inputWrap.classList.remove('hidden');
+                    warnText.classList.add('hidden');
+                }
+            } else {
+                inputWrap.classList.remove('hidden');
+                anonWrap.classList.remove('hidden');
+                warnText.classList.add('hidden');
+            }
+
+            const lbl = document.getElementById('commContextLabel');
+            lbl.innerText = currentCommSpace === 'school' ? '전체 학교' : (currentCommSpace === 'grade' ? `${currentUser.grade}학년` : `${currentUser.grade}학년 ${currentUser.classNum}반`);
+
+            const allPosts = JSON.parse(localStorage.getItem('scll_posts') || "[]");
+            const filtered = allPosts.filter(p => {
+                if (p.schoolCode !== currentSchool.code) return false;
+                if (p.type !== currentCommType) return false;
+                if (currentCommSpace === 'school' && p.space === 'school') return true;
+                if (currentCommSpace === 'grade' && p.space === 'grade' && p.grade === currentUser.grade) return true;
+                if (currentCommSpace === 'class' && p.space === 'class' && p.grade === currentUser.grade && p.classNum === currentUser.classNum) return true;
+                return false;
+            });
+
+            const feed = document.getElementById('postFeed');
+            if (filtered.length === 0) {
+                feed.innerHTML = `<div class="text-center py-12 opacity-40 text-xs font-black uppercase"><i class="fa-regular fa-comment-dots text-5xl mb-4 text-main-theme"></i><br>등록된 게시글이 없습니다.</div>`;
                 return;
             }
-            list.innerHTML = reviews.slice().reverse().map(r => `
-                <div class="bg-zinc-900 p-4 rounded-lg border-l-4 border-main-red shadow-lg">
-                    <p class="text-xs font-bold text-zinc-100">${r.text}</p>
-                    <p class="text-[8px] text-zinc-600 uppercase font-black mt-2 tracking-tighter">${r.id} // ${r.time}</p>
+
+            feed.innerHTML = filtered.slice().reverse().map(p => {
+                const authorClass = p.author === '익명' ? 'opacity-50' : (p.role === 'teacher' ? 'text-blue-400' : 'text-main-theme');
+                return `
+                <div class="card-flat p-5 ${p.type === 'notice' ? 'border-l-4 border-l-main-theme bg-main-theme/5' : ''}">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-xs font-black ${authorClass}">${p.author} ${p.role === 'teacher'?'👨‍🏫':(p.role==='president'?'⭐':'')}</span>
+                        <span class="text-[10px] opacity-40 font-bold">${p.time}</span>
+                    </div>
+                    <p class="text-sm font-bold leading-relaxed whitespace-pre-wrap mb-3">${p.content}</p>
+                    ${p.image ? `<img src="${p.image}" class="image-preview mb-3">` : ''}
+                    <button onclick="openRepliesModal(${p.id})" class="text-xs text-main-theme font-black flex items-center gap-1 hover:opacity-80">
+                        <i class="fa-solid fa-reply"></i> 댓글 <span class="opacity-60">${(JSON.parse(localStorage.getItem('scll_replies') || '{}')[p.id]?.length || 0)}</span>
+                    </button>
                 </div>
-            `).join('');
+            `}).join('');
         }
 
-        // --- BURN & STATS ---
-        function calculateBurn() {
-            if (!isLoggedIn) return;
-            const weight = parseFloat(currentUser.stats.weight) || 70;
-            const intakeText = document.getElementById('kcalDisplay').innerText;
-            const intake = parseFloat(intakeText) || 0;
-            let burned = 0;
+        function handleImageUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
 
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                currentImageData = event.target.result;
+                document.getElementById('imagePreview').src = currentImageData;
+                document.getElementById('imagePreviewArea').classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function clearImage() {
+            currentImageData = null;
+            document.getElementById('postImage').value = '';
+            document.getElementById('imagePreviewArea').classList.add('hidden');
+        }
+
+        function submitPost() {
+            if (!isLoggedIn) return showToast("로그인이 필요합니다.");
+            const content = document.getElementById('postContent').value.trim();
+            if (!content) return;
+
+            const isAnon = currentCommType === 'notice' ? false : document.getElementById('postAnon').checked;
+            const post = {
+                id: Date.now(),
+                schoolCode: currentSchool.code,
+                space: currentCommSpace,
+                grade: currentUser.grade,
+                classNum: currentUser.classNum,
+                type: currentCommType,
+                content: content,
+                author: isAnon ? '익명' : currentUser.id,
+                role: isAnon ? 'student' : currentUser.role,
+                time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+                image: currentImageData || null
+            };
+
+            const posts = JSON.parse(localStorage.getItem('scll_posts') || "[]");
+            posts.push(post);
+            localStorage.setItem('scll_posts', JSON.stringify(posts));
+
+            document.getElementById('postContent').value = '';
+            clearImage();
+            renderCommunity();
+            showToast("등록되었습니다.");
+        }
+
+        function openRepliesModal(postId) {
+            selectedPostId = postId;
+            const repliesData = JSON.parse(localStorage.getItem('scll_replies') || "{}");
+            const replies = repliesData[postId] || [];
+
+            const list = document.getElementById('repliesList');
+            if (replies.length === 0) {
+                list.innerHTML = '<p class="text-xs opacity-50 text-center py-4">댓글이 없습니다.</p>';
+            } else {
+                list.innerHTML = replies.map(r => `
+                    <div class="reply-item">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="font-black text-xs text-main-theme">${r.author}</span>
+                            <span class="text-[9px] opacity-40">${r.time}</span>
+                        </div>
+                        <p class="text-xs">${r.content}</p>
+                        ${r.image ? `<img src="${r.image}" class="image-preview mt-2">` : ''}
+                    </div>
+                `).join('');
+            }
+
+            document.getElementById('repliesModal').classList.add('active');
+        }
+
+        function closeRepliesModal() {
+            document.getElementById('repliesModal').classList.remove('active');
+            document.getElementById('replyContent').value = '';
+            selectedPostId = null;
+        }
+
+        function submitReply() {
+            if (!isLoggedIn || !selectedPostId) return;
+            const content = document.getElementById('replyContent').value.trim();
+            if (!content) return;
+
+            const repliesData = JSON.parse(localStorage.getItem('scll_replies') || "{}");
+            if (!repliesData[selectedPostId]) repliesData[selectedPostId] = [];
+
+            repliesData[selectedPostId].push({
+                author: currentUser.id,
+                content: content,
+                time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+                image: null
+            });
+
+            localStorage.setItem('scll_replies', JSON.stringify(repliesData));
+            document.getElementById('replyContent').value = '';
+            openRepliesModal(selectedPostId);
+            showToast("댓글이 등록되었습니다.");
+        }
+
+        // ========== MEAL+ ==========
+        function calculateBurn() {
+            let burned = 0;
             document.querySelectorAll('.ex-item').forEach(item => {
                 const range = item.querySelector('.ex-range');
                 const val = parseFloat(range.value);
-                const rate = parseFloat(item.dataset.val);
-                
-                let currentBurn = 0;
-                if (item.innerText.includes('RUNNING')) {
-                    currentBurn = (val * rate * (weight / 70)); // KM 당 소모
-                } else {
-                    currentBurn = (val * rate); // 개수 당 소모 (몸무게 영향 적음)
-                }
+                const rate = parseFloat(item.dataset.cal);
+
+                let currentBurn = (val * rate);
                 burned += currentBurn;
-                item.querySelector('.val-display').innerText = `${val} ${item.innerText.includes('RUNNING') ? 'KM' : 'REPS'}`;
+
+                const label = item.querySelector('span[id^="val-"]');
+                label.innerText = `${val} ${item.querySelector('.fa-person-running') ? 'KM' : 'REPS'}`;
             });
 
-            const diff = intake - burned;
-            const res = document.getElementById('burnResult');
-            const banner = document.getElementById('recommendationText');
-            
-            document.getElementById('burnIntakeDisplay').innerText = `INTAKE: ${intake.toFixed(0)} KCAL // TARGET: ${burned.toFixed(0)} KCAL`;
-            document.getElementById('burnDetail').innerText = `Est. total burn: ${burned.toFixed(1)} kcal`;
+            document.getElementById('burnRatioText').innerText = `섭취 ${Math.round(currentIntakeKcal)} / 소모 ${Math.round(burned)} KCAL`;
 
-            if (intake === 0) {
-                res.innerText = "NO DATA";
-                res.className = "text-4xl font-brand italic text-zinc-700";
-                banner.innerText = "WAITING SYNC";
-            } else if (diff > 100) {
-                res.innerText = "NEED BURN.";
-                res.className = "text-4xl font-brand italic text-main-red";
-                banner.innerText = "WORKOUT REQUIRED";
-            } else if (diff < -100) {
-                res.innerText = "CLEARED.";
-                res.className = "text-4xl font-brand italic text-blue-500";
-                banner.innerText = "ENERGY DEFICIT";
+            const statusEl = document.getElementById('burnStatusText');
+            if (currentIntakeKcal === 0) {
+                statusEl.innerText = "급식 정보 없음";
             } else {
-                res.innerText = "BALANCED.";
-                res.className = "text-4xl font-brand italic text-white";
-                banner.innerText = "PERFECT RATIO";
+                const diff = currentIntakeKcal - burned;
+                if (diff > 200) statusEl.innerText = "🔥 운동 더 하세요!";
+                else if (diff > 0) statusEl.innerText = "👍 거의 다 태웠어요!";
+                else statusEl.innerText = "🎯 완벽한 소모!";
             }
         }
 
-        function saveStats() {
-            if (!isLoggedIn) return;
-            currentUser.stats.height = document.getElementById('u-height').value;
-            currentUser.stats.weight = document.getElementById('u-weight').value;
-            const users = JSON.parse(localStorage.getItem('scll_users'));
-            users[currentUser.id] = currentUser;
-            localStorage.setItem('scll_users', JSON.stringify(users));
-            localStorage.setItem('scll_session', JSON.stringify(currentUser));
-            showToast("CONFIG UPDATED");
-            calculateBurn();
+        function voteTier(tier) {
+            if (!isLoggedIn) return showToast("로그인이 필요합니다.");
+            if (!currentSchool) return showToast("학교를 먼저 설정해주세요.");
+            if (currentIntakeKcal === 0) return showToast("급식 정보가 없습니다.");
+
+            const key = `${currentSchool.code}_${selectedDate}_${currentMealType}`;
+            let allVotes = JSON.parse(localStorage.getItem('scll_all_votes') || "{}");
+            let myVotes = JSON.parse(localStorage.getItem('scll_my_votes') || "{}");
+            const userVoteKey = `${currentUser.id}_${key}`;
+
+            if (myVotes[userVoteKey] === tier) return showToast("이미 투표하셨습니다.");
+            if (myVotes[userVoteKey]) allVotes[key][myVotes[userVoteKey]]--;
+
+            if (!allVotes[key]) allVotes[key] = { "S+": 0, "A": 0, "B": 0, "F": 0 };
+            allVotes[key][tier]++;
+            myVotes[userVoteKey] = tier;
+
+            localStorage.setItem('scll_all_votes', JSON.stringify(allVotes));
+            localStorage.setItem('scll_my_votes', JSON.stringify(myVotes));
+            renderVote();
+            showToast(`${tier} 등급으로 평가 완료!`);
         }
 
-        // --- UTILS ---
-        function autoMealType() {
-            const h = new Date().getHours();
-            if (h < 9) currentMealType = '1';
-            else if (h < 14) currentMealType = '2';
-            else currentMealType = '3';
-            updateMealBtnUI();
+        function renderVote() {
+            if (!isLoggedIn || !currentSchool) return;
+            const key = `${currentSchool.code}_${selectedDate}_${currentMealType}`;
+            const allVotes = JSON.parse(localStorage.getItem('scll_all_votes') || "{}");
+            const v = allVotes[key] || { "S+": 0, "A": 0, "B": 0, "F": 0 };
+            const total = Object.values(v).reduce((a, b) => a + b, 0) || 1;
+
+            document.getElementById('statsBars').innerHTML = Object.entries(v).map(([t, count]) => {
+                const p = (count / total * 100).toFixed(0);
+                return `
+                <div class="flex flex-col gap-2 mb-4">
+                    <div class="flex justify-between text-xs font-black uppercase opacity-90">
+                        <span>${t} TIER</span><span>${p}%</span>
+                    </div>
+                    <div class="w-full bg-black/50 h-3 rounded-full overflow-hidden border border-main-theme">
+                        <div class="bg-main-theme h-full" style="width:${p}%"></div>
+                    </div>
+                </div>`;
+            }).join('');
         }
 
-        function updateCountdown() {
-            const now = new Date();
-            const target = new Date();
-            if (currentMealType === '1') target.setHours(8, 0, 0);
-            else if (currentMealType === '2') target.setHours(12, 30, 0);
-            else target.setHours(18, 30, 0);
-            
-            if (now > target) target.setDate(target.getDate() + 1);
-            const diff = target - now;
-            const h = String(Math.floor(diff / 3600000)).padStart(2, '0');
-            const m = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
-            const s = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
-            document.getElementById('countdown').innerText = `${h}:${m}:${s}`;
-            document.getElementById('progressBar').style.width = `${Math.min(100, Math.max(0, 100 - (diff / 14400000 * 100)))}%`;
-            document.getElementById('countdownLabel').innerText = (currentMealType==='1'?'NEXT: BREAKFAST':currentMealType==='2'?'NEXT: LUNCH':'NEXT: DINNER');
-        }
-
-        function updateTierDisplay() {
-            const key = `${currentSchool?.code}_${selectedDate}_${currentMealType}`;
-            const votes = (JSON.parse(localStorage.getItem('scll_all_votes') || "{}"))[key];
-            const tag = document.getElementById('tierTag');
-            const src = document.getElementById('tierSource');
-
-            if (votes) {
-                let maxT = 'B'; let maxV = -1;
-                Object.entries(votes).forEach(([t, v]) => { if (v > maxV) { maxV = v; maxT = t; } });
-                tag.innerText = `TIER ${maxT}`; src.innerText = "COMMUNITY RATED";
-            } else {
-                const meal = cachedMeals[currentMealType];
-                if(!meal) { tag.innerText = "TIER -"; src.innerText = "OFFLINE"; return; }
-                const count = meal.DDISH_NM.split('<br/>').length;
-                tag.innerText = `TIER ${count > 7 ? 'S+' : count > 5 ? 'A' : 'B'}`;
-                src.innerText = "SYSTEM ESTIMATED";
-            }
-        }
-
+        // ========== 알레르기 ==========
         function initAllergyUI() {
             const container = document.getElementById('allergySet');
             container.innerHTML = ALLERGIES.map(a => `
                 <input type="checkbox" id="alg-${a}" class="hidden" onchange="toggleAlg('${a}')">
-                <label for="alg-${a}" class="block text-center py-2 border border-zinc-800 font-black text-[9px] cursor-pointer rounded-lg uppercase transition-all hover:border-main-red">${a}</label>
+                <label for="alg-${a}" class="block text-center py-2 bg-black/50 border border-main-theme font-black text-[10px] cursor-pointer rounded-lg uppercase transition-all shadow-sm">${a}</label>
             `).join('');
-            syncAllergyCheckboxes();
         }
 
         function syncAllergyCheckboxes() {
             if(!isLoggedIn) return;
-            currentUser.allergies.forEach(a => {
+            ALLERGIES.forEach(a => {
                 const cb = document.getElementById(`alg-${a}`);
-                if(cb) cb.checked = true;
+                if(cb) cb.checked = currentUser.allergies.includes(a);
             });
         }
 
         function toggleAlg(a) {
-            if (!isLoggedIn) return showToast("LOGIN REQUIRED");
+            if (!isLoggedIn) return showToast("로그인 후 설정 가능합니다.");
             if (currentUser.allergies.includes(a)) currentUser.allergies = currentUser.allergies.filter(x => x !== a);
             else currentUser.allergies.push(a);
-            saveStats();
+            saveUser();
             renderMeal(currentMealType);
         }
 
-        function handlePowerBtn() { 
-            if (isLoggedIn) handleLogout(); 
-            else { 
-                localStorage.removeItem('scll_school'); 
-                showToast("SCHOOL DATA RESET");
-                location.reload(); 
-            } 
+        function saveUser() {
+            const users = JSON.parse(localStorage.getItem('scll_users'));
+            users[currentUser.id] = currentUser;
+            localStorage.setItem('scll_users', JSON.stringify(users));
+            localStorage.setItem('scll_session', JSON.stringify(currentUser));
         }
 
-        function exportToJson() {
-            const keys = ['scll_users', 'scll_all_votes', 'scll_reviews', 'scll_school'];
-            const exportData = {};
-            
-            keys.forEach(key => {
-                const data = localStorage.getItem(key);
-                exportData[key] = data ? JSON.parse(data) : null;
-            });
-
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportData, null, 2));
-            const downloadAnchorNode = document.createElement('a');
-            downloadAnchorNode.setAttribute("href", dataStr);
-            downloadAnchorNode.setAttribute("download", "scll_system_data.json");
-            document.body.appendChild(downloadAnchorNode);
-            downloadAnchorNode.click();
-            downloadAnchorNode.remove();
-            showToast("DATA EXPORTED AS JSON");
-        }
-
-        function showLoading(v) { document.getElementById('loading').style.display = v ? 'flex' : 'none'; }
-
-        function showToast(m) {
-            const container = document.getElementById('toastContainer');
-            const t = document.createElement('div');
-            t.className = "bg-white text-black font-black px-6 py-3 border-b-4 border-main-red shadow-2xl text-[10px] rounded-lg uppercase italic mb-2 transform transition-all duration-300 translate-y-0 opacity-100";
-            t.innerText = m;
-            container.appendChild(t);
-            setTimeout(() => { 
-                t.style.opacity = '0'; 
-                t.style.transform = 'translateY(-10px)';
-                setTimeout(() => t.remove(), 300); 
-            }, 2500);
-        }
-
-        function setMealType(t) { 
-            currentMealType = t; 
-            updateMealBtnUI(); 
-            if(cachedMeals[t]) renderMeal(t);
-            else fetchMeal(); 
-        }
-
-        function updateMealBtnUI() {
-            document.querySelectorAll('.meal-btn').forEach(b => {
-                if (b.dataset.type === currentMealType) { b.classList.add('bg-white', 'text-black'); b.classList.remove('text-white'); }
-                else { b.classList.remove('bg-white', 'text-black'); b.classList.add('text-white'); }
-            });
+        function handlePowerBtn() {
+            localStorage.removeItem('scll_school');
+            localStorage.removeItem('scll_session');
+            location.reload();
         }
     </script>
 </body>
